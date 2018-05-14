@@ -13,10 +13,10 @@
 <style>
 .v-charts-component-loading {
   position: absolute;
-  left: 0;
-  right: 0;
   top: 0;
+  right: 0;
   bottom: 0;
+  left: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,11 +31,12 @@
 
 .v-charts-component-loading .path {
   animation: loading-dash 1.5s ease-in-out infinite;
+
+  stroke: #20a0ff;
   stroke-dasharray: 90,150;
   stroke-dashoffset: 0;
-  stroke-width: 2;
-  stroke: #20a0ff;
   stroke-linecap: round;
+  stroke-width: 2;
 }
 
 @keyframes loading-rotate {

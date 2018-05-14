@@ -1,12 +1,20 @@
 const rollup = require('rollup')
-const vue = require('rollup-plugin-vue')
+const vue = require('rollup-plugin-vue').default
 const resolve = require('rollup-plugin-node-resolve')
 const babel = require('rollup-plugin-babel')
 const eslint = require('rollup-plugin-eslint')
-const componentInfo = require('../src/component-list')
 const uglify = require('rollup-plugin-uglify')
 const autoprefixer = require('autoprefixer')
 const cssnano = require('cssnano')
+const alias = require('rollup-plugin-alias')
+const commonjs = require('rollup-plugin-commonjs')
+const path = require('path')
+
+function resolvePath (dir) {
+  return path.join(__dirname, '..', dir)
+}
+
+const componentInfo = require('../src/component-list')
 
 let pkg = []
 const pkgTypeList = [
@@ -54,10 +62,16 @@ function rollupFn (item) {
       throwError: true,
       exclude: 'node_modules/**'
     }),
+    alias({
+      resolve: ['.js', '.vue'],
+      '@': resolvePath('src'),
+      'packages': resolvePath('packages')
+    }),
     vue(vueSettings),
     resolve({
       extensions: ['.js', '.vue']
     }),
+    commonjs(),
     babel({
       exclude: 'node_modules/**',
       plugins: ['external-helpers']
@@ -66,7 +80,7 @@ function rollupFn (item) {
   if (item.min) plugins.push(uglify())
 
   rollup.rollup({
-    entry: item.src,
+    input: item.src,
     external: id => /^echarts/.test(id),
     plugins
   }).then(function (bundle) {
@@ -74,11 +88,14 @@ function rollupFn (item) {
 
     bundle.write({
       format: item.type,
-      moduleName: item.globalName,
+      name: item.globalName,
       globals: {
         'echarts/lib/echarts': 'echarts'
       },
-      dest
+      file: dest
+    }).catch(e => {
+      console.log(e)
+      process.exit(1)
     })
   }).catch((e) => {
     console.log(e)

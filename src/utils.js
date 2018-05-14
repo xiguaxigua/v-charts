@@ -1,3 +1,4 @@
+// TODO: 删除，使用 numeral 代替
 export const numberFormat = (val, digits = 2) => {
   if (isNaN(+val)) return val
 
@@ -18,13 +19,13 @@ export const numberFormat = (val, digits = 2) => {
 
   return val.toString()
 }
-
+// TODO: 删除，使用 numeral 代替
 export const formatTausends = (num) => {
   return String(num).replace(/^(\s+|-)?\d+(?=.?\d*($|\s))/g, (m) => {
     return m.replace(/(?=(?!\b)(\d{3})+$)/g, ',')
   })
 }
-
+// TODO: 删除，使用 numeral 代替
 export const getFormated = (val, type, digit = 2, defaultVal = '-') => {
   if (val == null || isNaN(val)) return defaultVal
   switch (type) {
@@ -33,13 +34,6 @@ export const getFormated = (val, type, digit = 2, defaultVal = '-') => {
     case 'normal': return formatTausends(val)
     default: return val
   }
-}
-
-export const getLineKB = (s, v) => {
-  const result = []
-  result[0] = (s[1] - s[0]) / (v[1] - v[0])
-  result[1] = s[0] - result[0] * v[0]
-  return result
 }
 
 export const getStackMap = (stack) => {
@@ -122,19 +116,13 @@ export const getAmap = (key, v) => {
   }
   return amapPromise
 }
-
+// TODO: 删除，使用 clone 代替
 export const clone = (v) => JSON.parse(JSON.stringify(v))
 
-export const getType = (v) => {
-  return Object.prototype.toString.call(v)
-}
+export const getType = (v) => Object.prototype.toString.call(v)
 
 export const toKebab = (v) => v.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 
-export const isArray = (v) => {
-  return getType(v) === '[object Array]'
-}
+export const isArray = (v) => getType(v) === '[object Array]'
 
-export const isObject = (v) => {
-  return getType(v) === '[object Object]'
-}
+export const isObject = (v) => getType(v) === '[object Object]'

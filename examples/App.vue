@@ -25,7 +25,11 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
 html, body {
   height: 100%;
 }
@@ -34,41 +38,42 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
 
-  .top-container {
-    height: 60px;
-    border-bottom: 1px solid #ccc;
-  }
+.top-container {
+  height: 60px;
+  border-bottom: 1px solid #ccc;
+}
 
-  .multi-tip {
-    color: #ccc;
-  }
+.multi-tip {
+  color: #ccc;
+}
 
-  .multi-title {
-    color: #888;
-  }
+.multi-title {
+  color: #888;
+}
 
-  .main-container {
-    flex: 1;
-    display: flex;
+.main-container {
+  flex: 1;
+  display: flex;
+}
 
-    .left-section {
-      width: 150px;
-      height: 100%;
-      overflow: auto;
-      background-color: #f8f8f8;
-      border-right: 1px solid #f2f2f2;
-    }
+.left-section {
+  width: 150px;
+  height: 100%;
+  overflow: auto;
+  background-color: #f8f8f8;
+  border-right: 1px solid #f2f2f2;
+}
 
-    .right-section {
-      flex: 1;
-      overflow: auto;
-      padding: 20px;
-      font-size: 14px;
-      p {
-        line-height: 22px;
-      }
-    }
-  }
+.right-section {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  font-size: 14px;
+}
+
+.right-section p {
+  line-height: 22px;
 }
 </style>

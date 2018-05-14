@@ -1,12 +1,16 @@
-import { color } from './echarts-base'
-import { getType, toKebab, isArray, isObject } from './utils'
-import Loading from './components/loading'
-import DataEmpty from './components/data-empty'
+import { COLORS, NO_DATA_LOGIC_PROPS, DEFAULT_THEME } from './constants'
+import { toKebab, isArray, isObject } from './utils'
+import Loading from '@/components/loading'
+import DataEmpty from '@/components/data-empty'
+import debounce from 'throttle-debounce/debounce'
 
 export default {
   render (h) {
     return h('div', {
-      class: [toKebab(this.$options.name || this.$options._componentTag)],
+      class: [
+        toKebab(this.$options.name || this.$options._componentTag),
+        this.className // TODO: add test case
+      ],
       style: this.canvasStyle
     }, [
       h('div', {
@@ -24,27 +28,53 @@ export default {
   },
 
   props: {
+    // custom props
     data: { type: [Object, Array], default () { return {} } },
     settings: { type: Object, default () { return {} } },
+
     width: { type: String, default: 'auto' },
     height: { type: String, default: '400px' },
-    beforeConfig: { type: Function },
-    afterConfig: { type: Function },
-    afterSetOption: { type: Function },
-    afterSetOptionOnce: { type: Function },
-    events: { type: Object },
-    grid: { type: [Object, Array] },
-    colors: { type: Array },
+    className: String,
+
+    beforeConfig: Function,
+    afterConfig: Function,
+    afterSetOption: Function,
+    afterSetOptionOnce: Function,
+
+    events: Object,
+
+    initOptions: { type: Object, default () { return {} } },
+
     tooltipVisible: { type: Boolean, default: true },
     legendVisible: { type: Boolean, default: true },
-    legendPosition: { type: String },
-    markLine: { type: Object },
-    markArea: { type: Object },
-    markPoint: { type: Object },
-    visualMap: { type: [Object, Array] },
-    dataZoom: { type: [Object, Array] },
-    toolbox: { type: [Object, Array] },
-    initOptions: { type: Object, default () { return {} } },
+
+    markLine: Object,
+    markArea: Object,
+    markPoint: Object,
+
+    theme: Object,
+    themeName: String,
+
+    loading: Boolean,
+    dataEmpty: Boolean,
+
+    extend: Object,
+
+    judgeWidth: { type: Boolean, default: false },
+    widthChangeDelay: { type: Number, default: 300 },
+
+    tooltipFormatter: { type: Function },
+
+    resizeable: { type: Boolean, default: true },
+    resizeDelay: { type: Number, default: 200 },
+
+    changeDelay: { type: Number, default: 0 },
+    // echarts props
+    grid: [Object, Array],
+    colors: Array,
+    visualMap: [Object, Array],
+    dataZoom: [Object, Array],
+    toolbox: [Object, Array],
     title: Object,
     legend: [Object, Array],
     xAxis: [Object, Array],
@@ -59,30 +89,21 @@ export default {
     series: [Object, Array],
     backgroundColor: [Object, String],
     textStyle: Object,
-    animation: Object,
-    theme: Object,
-    themeName: String,
-    loading: Boolean,
-    dataEmpty: Boolean,
-    extend: Object,
-    judgeWidth: { type: Boolean, default: true },
-    widthChangeDelay: { type: Number, default: 300 },
-    tooltipFormatter: { type: Function }
+    animation: Object
   },
 
   watch: {
     data: {
       deep: true,
       handler (v) {
-        if (v) { this.dataHandler(v) }
+        if (v) this.changeHandler()
       }
     },
 
     settings: {
       deep: true,
       handler (v) {
-        if (v.type && this.chartLib) this.chartHandler = this.chartLib[v.type]
-        this.dataHandler(this.data)
+        if (v) this.changeHandler()
       }
     },
 
@@ -115,115 +136,180 @@ export default {
     },
 
     chartColor () {
-      return this.colors || (this.theme && this.theme.color) || color
+      return this.colors || (this.theme && this.theme.color) || COLORS
     }
   },
 
   methods: {
-    dataHandler (data) {
-      if (!this.chartHandler) return
-      const { columns = [], rows = [] } = data
-      const extra = {
-        tooltipVisible: this.tooltipVisible,
-        legendVisible: this.legendVisible,
-        echarts: this.echarts,
-        color: this.chartColor,
-        tooltipFormatter: this.tooltipFormatter
-      }
-      if (this.beforeConfig) data = this.beforeConfig(data)
+    init () {
+      const {
+        echarts,
+        themeName,
+        theme,
+        $refs: {
+          canvas
+        },
+        initOptions,
+        echartsLib,
+        data,
+        createEventProxy,
+        resizeable,
+        resizeHandler
+      } = this
 
-      let options = this.chartHandler(columns, rows, this.settings, extra)
-      if (options) {
-        if (typeof options.then === 'function') {
-          options.then(this.optionsHandler)
-        } else {
-          this.optionsHandler(options)
-        }
-      }
+      if (echarts) return
+      const themeArg = themeName || theme || DEFAULT_THEME
+      this.echarts = echartsLib.init(canvas, themeArg, initOptions)
+      if (data) this.changeHandler()
+      createEventProxy()
+      if (resizeable) window.addEventListener('resize', resizeHandler)
     },
 
-    resize () {
-      this.echarts.resize()
+    dataHandler () {
+      const {
+        chartHandler,
+        tooltipVisible,
+        legendVisible,
+        echarts,
+        tooltipFormatter,
+        optionsHandler,
+        settings,
+        beforeConfig
+      } = this
+      let { data } = this
+      const extra = {
+        tooltipVisible,
+        legendVisible,
+        echarts,
+        tooltipFormatter
+      }
+      let options = {}
+
+      if (!chartHandler) return
+      if (beforeConfig) data = beforeConfig(data)
+
+      const { columns = [], rows = [] } = data
+
+      options = chartHandler(
+        options,
+        columns,
+        rows,
+        settings,
+        extra
+      )
+
+      if (options) {
+        if (typeof options.then === 'function') {
+          options.then(optionsHandler)
+        } else {
+          optionsHandler(options)
+        }
+      }
     },
 
     optionsHandler (options) {
-      if (this.legendPosition && options.legend) {
-        options.legend[this.legendPosition] = 10
-        if (~['left', 'right'].indexOf(this.legendPosition)) {
-          options.legend.top = 'middle'
-          options.legend.orient = 'vertical'
-        }
-      }
-      if (!this.themeName) options.color = this.chartColor
-      const echartsSettings = [
+      const {
+        animation,
+        markArea,
+        markLine,
+        markPoint,
+        addMark,
+        chartColor,
+        getExtendOptions,
+        extend,
+        afterConfig,
+        echarts,
+        _once,
+        afterSetOption,
+        afterSetOptionOnce,
+        judgeWidth
+      } = this
+      // add echarts origin options attributes
+      const echartsAttrs = [
         'grid', 'dataZoom', 'visualMap', 'toolbox', 'title', 'legend',
         'xAxis', 'yAxis', 'radar', 'tooltip', 'axisPointer', 'brush',
         'geo', 'timeline', 'graphic', 'series', 'backgroundColor',
         'textStyle'
       ]
-      echartsSettings.forEach(setting => {
-        if (this[setting]) options[setting] = this[setting]
+      echartsAttrs.forEach(setting => {
+        if (this[setting] != null) options[setting] = this[setting]
       })
-      if (this.animation) {
-        Object.keys(this.animation).forEach(key => {
-          options[key] = this.animation[key]
+
+      // add animation related to echarts options
+      if (animation) {
+        Object.keys(animation).forEach(key => {
+          options[key] = animation[key]
         })
       }
-      if (this.markArea || this.markLine || this.markPoint) {
+      // add mark* to echarts series
+      if (markArea || markLine || markPoint) {
         const marks = {
-          markArea: this.markArea,
-          markLine: this.markLine,
-          markPoint: this.markPoint
+          markArea: markArea,
+          markLine: markLine,
+          markPoint: markPoint
         }
         const series = options.series
-        if (getType(series) === '[object Array]') {
+        if (isArray(series)) {
           series.forEach(item => {
-            this.addMark(item, marks)
+            addMark(item, marks)
           })
-        } else if (getType(series) === '[object Object]') {
-          this.addMark(series, marks)
+        } else if (isObject(series)) {
+          addMark(series, marks)
         }
       }
 
-      // extend sub attribute
-      if (this.extend) {
-        Object.keys(this.extend).forEach(attr => {
-          if (typeof this.extend[attr] === 'function') {
-            // get callback value
-            options[attr] = this.extend[attr](options[attr])
-          } else {
-            // mixin extend value
-            if (isArray(options[attr]) && isObject(options[attr][0])) {
-              // eg: [{ xx: 1 }, { xx: 2 }]
-              options[attr].forEach((option, index) => {
-                options[attr][index] = Object.assign({}, option, this.extend[attr])
-              })
-            } else if (isObject(options[attr])) {
-              // eg: { xx: 1, yy: 2 }
-              options[attr] = Object.assign({}, options[attr], this.extend[attr])
-            } else {
-              options[attr] = this.extend[attr]
-            }
-          }
-        })
+      options.color = chartColor
+
+      if (extend) getExtendOptions(options, extend)
+
+      if (afterConfig) options = afterConfig(options)
+
+      echarts.setOption(options, true)
+
+      if (judgeWidth) this.judgeWidthHandler(options)
+
+      this.$emit('ready', echarts)
+      if (!_once['ready-once']) {
+        _once['ready-once'] = true
+        this.$emit('ready-once', echarts)
       }
 
-      if (this.afterConfig) options = this.afterConfig(options)
-      this.echarts.setOption(options, true)
-      this.$emit('ready', this.echarts)
-      if (!this._once['ready-once']) {
-        this._once['ready-once'] = true
-        this.$emit('ready-once', this.echarts)
-      }
-      if (this.judgeWidth) this.judgeWidthHandler(options)
-      if (this.afterSetOption) this.afterSetOption(this.echarts)
-      if (this.afterSetOptionOnce && !this._once['afterSetOptionOnce']) {
-        this._once['afterSetOptionOnce'] = this.afterSetOptionOnce(this.echarts)
+      if (afterSetOption) afterSetOption(echarts)
+      if (afterSetOptionOnce && !_once['afterSetOptionOnce']) {
+        _once['afterSetOptionOnce'] = afterSetOptionOnce(echarts)
       }
     },
 
+    getExtendOptions (options, extend) {
+      // extend sub attribute
+      // TODO: add more convenient extend
+      Object.keys(extend).forEach(attr => {
+        if (typeof extend[attr] === 'function') {
+          // get callback value
+          options[attr] = extend[attr](options[attr])
+        } else {
+          // mixin extend value
+          if (isArray(options[attr]) && isObject(options[attr][0])) {
+            // eg: [{ xx: 1 }, { xx: 2 }]
+            options[attr].forEach((option, index) => {
+              options[attr][index] = Object.assign({}, option, extend[attr])
+            })
+          } else if (isObject(options[attr])) {
+            // eg: { xx: 1, yy: 2 }
+            options[attr] = Object.assign({}, options[attr], extend[attr])
+          } else {
+            options[attr] = extend[attr]
+          }
+        }
+      })
+    },
+
     judgeWidthHandler (options) {
-      const { echarts, widthChangeDelay } = this
+      const {
+        echarts,
+        widthChangeDelay
+      } = this
+
       if (this.$el.clientWidth) {
         echarts && echarts.resize()
       } else {
@@ -244,32 +330,28 @@ export default {
 
     addMark (seriesItem, marks) {
       Object.keys(marks).forEach(key => {
-        if (marks[key]) {
-          seriesItem[key] = marks[key]
-        }
+        if (marks[key]) seriesItem[key] = marks[key]
       })
     },
 
-    init () {
-      if (this.echarts) return
-      const themeName = this.themeName || this.theme || 've-chart'
-      this.echarts = this.echartsLib.init(this.$refs.canvas, themeName, this.initOptions)
-      if (this.data) this.dataHandler(this.data)
-      this.createEventProxy()
-      window.addEventListener('resize', this.echarts.resize)
+    resize () {
+      this.echarts.resize()
     },
 
     addWatchToProps () {
-      const watchedVariable = this._watchers.map(watcher => watcher.expression)
-      Object.keys(this.$props).forEach(prop => {
-        if (!~watchedVariable.indexOf(prop)) {
+      const {
+        changeHandler,
+        $props,
+        _watchers
+      } = this
+      const watchedVariable = _watchers.map(watcher => watcher.expression)
+      Object.keys($props).forEach(prop => {
+        if (!~watchedVariable.indexOf(prop) &&
+          !~NO_DATA_LOGIC_PROPS.indexOf(prop)) {
           const opts = {}
-          if (getType(this.$props[prop]) === '[object Object]') {
-            opts.deep = true
-          }
-          this.$watch(prop, () => {
-            this.dataHandler(this.data)
-          }, opts)
+          const item = $props[prop]
+          if (isObject(item) || isArray(item)) opts.deep = true
+          this.$watch(prop, changeHandler, opts)
         }
       })
     },
@@ -278,12 +360,17 @@ export default {
       // 只要用户使用 on 方法绑定的事件都做一层代理，
       // 是否真正执行相应的事件方法取决于该方法是否仍然存在 events 中
       // 实现 events 的动态响应
+      const {
+        registeredEvents,
+        events,
+        echarts
+      } = this
       const self = this
-      const keys = Object.keys(this.events || {})
+      const keys = Object.keys(events || {})
       keys.length && keys.forEach(ev => {
-        if (this.registeredEvents.indexOf(ev) === -1) {
-          this.registeredEvents.push(ev)
-          this.echarts.on(ev, (function (ev) {
+        if (registeredEvents.indexOf(ev) === -1) {
+          registeredEvents.push(ev)
+          echarts.on(ev, (function (ev) {
             return function (...args) {
               if (ev in self.events) {
                 self.events[ev].apply(null, args)
@@ -301,7 +388,9 @@ export default {
     },
 
     clean () {
-      window.removeEventListener('resize', this.echarts.resize)
+      if (this.resizeable) {
+        window.removeEventListener('resize', this.resizeHandler)
+      }
       this.echarts.dispose()
     }
   },
@@ -310,6 +399,12 @@ export default {
     this.echarts = null
     this.registeredEvents = []
     this._once = {}
+    this.resizeHandler = debounce(this.resizeDelay, _ => {
+      this.echarts && this.echarts.resize()
+    })
+    this.changeHandler = debounce(this.changeDelay, _ => {
+      this.dataHandler()
+    })
     this.addWatchToProps()
   },
 

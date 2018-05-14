@@ -24,22 +24,22 @@
 </template>
 
 <script>
-import VeBar from '../../src/packages/bar'
-import VeLine from '../../src/packages/line'
-import VeHistogram from '../../src/packages/histogram'
-import VePie from '../../src/packages/pie'
-import VeRing from '../../src/packages/ring'
-import VeWaterfall from '../../src/packages/waterfall'
-import VeFunnel from '../../src/packages/funnel'
-import VeRadar from '../../src/packages/radar'
-import VeChart from '../../src/packages/chart'
-import VeMap from '../../src/packages/map'
-import VeSankey from '../../src/packages/sankey'
-import VeHeatmap from '../../src/packages/heatmap'
-import VeScatter from '../../src/packages/scatter'
-import VeCandle from '../../src/packages/candle'
-import VeGauge from '../../src/packages/gauge'
-import VeTree from '../../src/packages/tree'
+import VeLine from 'packages/line'
+// import VeBar from '../../src/packages/bar'
+// import VeHistogram from '../../src/packages/histogram'
+// import VePie from '../../src/packages/pie'
+// import VeRing from '../../src/packages/ring'
+// import VeWaterfall from '../../src/packages/waterfall'
+// import VeFunnel from '../../src/packages/funnel'
+// import VeRadar from '../../src/packages/radar'
+// import VeChart from '../../src/packages/chart'
+// import VeMap from '../../src/packages/map'
+// import VeSankey from '../../src/packages/sankey'
+// import VeHeatmap from '../../src/packages/heatmap'
+// import VeScatter from '../../src/packages/scatter'
+// import VeCandle from '../../src/packages/candle'
+// import VeGauge from '../../src/packages/gauge'
+// import VeTree from '../../src/packages/tree'
 import CHART_DATA from '../data'
 
 export default {
@@ -70,48 +70,46 @@ export default {
   },
 
   components: {
-    VeBar,
-    VeLine,
-    VeHistogram,
-    VePie,
-    VeRing,
-    VeWaterfall,
-    VeFunnel,
-    VeRadar,
-    VeChart,
-    VeMap,
-    VeSankey,
-    VeHeatmap,
-    VeScatter,
-    VeCandle,
-    VeGauge,
-    VeTree
+    // VeBar,
+    // VeHistogram,
+    // VePie,
+    // VeRing,
+    // VeWaterfall,
+    // VeFunnel,
+    // VeRadar,
+    // VeChart,
+    // VeMap,
+    // VeSankey,
+    // VeHeatmap,
+    // VeScatter,
+    // VeCandle,
+    // VeGauge,
+    // VeTree
+    VeLine
   }
 }
 </script>
 
-<style lang="less">
-.page-item-test {
-  h3, p {
-    margin: 0;
-  }
+<style>
+.page-item-test h3, p {
+  margin: 0;
+}
 
-  pre {
-    height: 150px;
-  }
+.page-item-test  pre {
+  height: 150px;
+}
 
-  .chart-item {
-    display: flex;
-    padding: 15px;
+.page-item-test  .chart-item {
+  display: flex;
+  padding: 15px;
+}
 
-    .chart-part {
-      flex: 1;
-    }
+.chart-part {
+  flex: 1;
+}
 
-    .code-view {
-      width: 400px;
-      margin-left: 20px;
-    }
-  }
+.code-view {
+  width: 400px;
+  margin-left: 20px;
 }
 </style>
