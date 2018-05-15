@@ -40,7 +40,6 @@ export default {
 
   methods: {
     getFormat (str) {
-      console.log
       const reg = new RegExp(`^(\\s{0,${window.CHART_CODE_INDENT}}|[\\n])`, 'gm')
       return str.replace(reg, '').replace(/^\s/, '')
     }

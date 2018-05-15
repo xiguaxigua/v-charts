@@ -128,7 +128,6 @@ export default {
       this.chartSettings = this.chartSettingsStore[this.index]
     },
     afterConfig (options) {
-      console.log(options)
       return options
     }
   },

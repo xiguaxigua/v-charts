@@ -216,6 +216,5 @@ export const line = (options, columns, rows, settings, extra) => {
     tooltipAlias
   }
   optionsAddAttr(options, { xAxis, yAxis, series, legend, tooltipSettings })
-  console.log(options)
   return options
 }

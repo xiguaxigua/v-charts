@@ -16,11 +16,11 @@ export default {
           { '日期': '1/6', '访问用户': 4593, '下单用户': 4293 }
         ]
       },
-      settings: {},
+      settings: {
+        yAxisType: ['0.0a']
+      },
       attr: {
-        extend: {
-          'series[0].a': 1
-        }
+        extend: {}
       }
     },
     {

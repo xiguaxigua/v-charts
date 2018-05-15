@@ -37,7 +37,6 @@ export default {
 
   methods: {
     afterConfig (item) {
-      console.log('render')
       return item
     }
   },

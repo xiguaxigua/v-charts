@@ -1,4 +1,3 @@
-import cloneDeep from 'lodash/cloneDeep'
 import numeral from 'numeral'
 
 export const getStackMap = (stack) => {
@@ -84,6 +83,8 @@ export const getAmap = (key, v) => {
 
 export const getType = v => Object.prototype.toString.call(v)
 
+export const clone = v => JSON.parse(JSON.stringify(v))
+
 export const toKebab = v => v.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 
 export const isArray = v => getType(v) === '[object Array]'
@@ -108,7 +109,7 @@ export const getFormat = (v, format, defaultValue = '-') => {
 }
 
 export const arrDelItem = (arr, item) => {
-  const result = cloneDeep(arr)
+  const result = clone(arr)
   const index = arr.indexOf(item)
   result.splice(index, 1)
   return result
@@ -138,5 +139,17 @@ export const optionsAddAttr = (obj, target, item) => {
     } else {
       obj[target] = [item]
     }
+  }
+}
+
+export const debounce = (fn, delay) => {
+  let timer = null
+  return function () {
+    const self = this
+    const args = arguments
+    clearTimeout(timer)
+    timer = setTimeout(function () {
+      fn.apply(self, args)
+    })
   }
 }

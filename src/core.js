@@ -1,9 +1,18 @@
-import { COLORS, NO_DATA_LOGIC_PROPS, DEFAULT_THEME } from './constants'
-import { toKebab, isArray, isObject, getFormat, getFnAndObjValue } from './utils'
+import {
+  COLORS,
+  NO_DATA_LOGIC_PROPS,
+  DEFAULT_THEME
+} from './constants'
+import {
+  toKebab,
+  isArray,
+  isObject,
+  getFormat,
+  getFnAndObjValue,
+  debounce
+} from './utils'
 import Loading from '@/components/loading'
 import DataEmpty from '@/components/data-empty'
-import debounce from 'lodash/debounce'
-import set from 'lodash/set'
 
 export default {
   render (h) {
@@ -340,9 +349,7 @@ export default {
     getExtendOptions (options, extend) {
       // extend sub attribute
       Object.keys(extend).forEach(attr => {
-        if (/\.|]/.test(attr)) {
-          set(options, attr, extend[attr])
-        } else if (typeof extend[attr] === 'function') {
+        if (typeof extend[attr] === 'function') {
           // get callback value
           options[attr] = extend[attr](options[attr])
         } else {
@@ -360,7 +367,6 @@ export default {
           }
         }
       })
-      console.log('options', options)
     },
 
     judgeWidthHandler (options) {
