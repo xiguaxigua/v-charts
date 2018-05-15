@@ -1,6 +1,7 @@
 /* eslint-disable comma-dangle */
 module.exports = {
   VeLine: { src: 'packages/line/index.js', dist: 'lib/line' },
+  Converter: { src: 'src/converter.js', dist: 'lib/converter' }
   // VeBar: { src: 'src/packages/bar/index.js', dist: 'lib/bar' },
   // VeHistogram: { src: 'src/packages/histogram/index.js', dist: 'lib/histogram' },
   // VeFunnel: { src: 'src/packages/funnel/index.js', dist: 'lib/funnel' },

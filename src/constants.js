@@ -22,7 +22,8 @@ export const DEFAULT_THEME = {
     splitLine: { show: false }
   },
   valueAxis: {
-    axisLine: { show: false }
+    axisLine: { show: false },
+    axisTick: { show: false }
   },
   line: {
     smooth: true

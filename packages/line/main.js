@@ -1,242 +1,221 @@
-import { getFormated, getStackMap } from '@/utils'
+import {
+  arrDelItem,
+  optionsAddAttr,
+  arrDelArrItem,
+  getStackMap,
+  getFormat,
+  getFnAndObjValue
+} from '@/utils'
 
-function getLineXAxis (args) {
-  const { dimension, rows, xAxisName, axisVisible, xAxisType } = args
-  return dimension.map((item, index) => ({
-    type: xAxisType,
-    nameLocation: 'middle',
-    nameGap: 22,
-    boundaryGap: false,
-    name: xAxisName[index] || '',
-    axisTick: { show: true, lineStyle: { color: '#eee' } },
-    data: rows.map(row => row[item]),
-    show: axisVisible
-  }))
-}
-
-function getLineSeries (args) {
+function getXAxis (args) {
   const {
+    dimension,
     rows,
-    axisSite,
-    metrics,
-    area,
-    stack,
-    nullAddZero,
-    labelMap,
-    label,
-    itemStyle,
-    lineStyle,
-    areaStyle,
+    gridIndex,
     xAxisType,
-    dimension
+    xAxisName,
+    axisVisible
   } = args
-  let series = []
-  const dataTemp = {}
-  const stackMap = stack && getStackMap(stack)
-  metrics.forEach(item => { dataTemp[item] = [] })
-  rows.forEach(row => {
-    metrics.forEach(item => {
-      let value = null
-      if (row[item] != null) {
-        value = row[item]
-      } else if (nullAddZero) {
-        value = 0
-      }
-      const dataItem = xAxisType === 'category'
-        ? value
-        : [row[dimension[0]], value]
-      dataTemp[item].push(dataItem)
-    })
-  })
-  metrics.forEach(item => {
-    let seriesItem = {
-      name: labelMap[item] != null ? labelMap[item] : item,
-      type: 'line',
-      data: dataTemp[item]
-    }
 
-    if (area) seriesItem.areaStyle = { normal: {} }
-    if (axisSite.right) {
-      seriesItem.yAxisIndex = ~axisSite.right.indexOf(item) ? 1 : 0
-    }
-
-    if (stack && stackMap[item]) seriesItem.stack = stackMap[item]
-
-    if (label) seriesItem.label = label
-    if (itemStyle) seriesItem.itemStyle = itemStyle
-    if (lineStyle) seriesItem.lineStyle = lineStyle
-    if (areaStyle) seriesItem.areaStyle = areaStyle
-
-    series.push(seriesItem)
-  })
-  return series.length ? series : false
+  return {
+    type: xAxisType,
+    name: xAxisName,
+    data: rows.map(row => ({ value: row[dimension] })),
+    show: axisVisible,
+    gridIndex
+  }
 }
 
-function getLineYAxis (args) {
+function getYAxis (args) {
   const {
-    yAxisName,
+    rightMetrics,
+    leftMetrics,
     yAxisType,
+    metricsType,
     axisVisible,
     scale,
     min,
     max,
-    digit
+    gridIndex,
+    yAxisName
   } = args
+  const yAxis = []
   const yAxisBase = {
     type: 'value',
-    axisTick: {
-      show: false
-    },
-    show: axisVisible
+    show: axisVisible,
+    gridIndex
   }
-  let yAxis = []
+  const types = [
+    yAxisType[0] || metricsType[leftMetrics[0]],
+    yAxisType[2] || metricsType[rightMetrics[0]]
+  ]
+
   for (let i = 0; i < 2; i++) {
-    if (yAxisType[i]) {
+    if (!(i && rightMetrics)) {
       yAxis[i] = Object.assign({}, yAxisBase, {
-        axisLabel: {
-          formatter (val) {
-            return getFormated(val, yAxisType[i], digit)
-          }
-        }
+        name: yAxisName[i] || '',
+        scale: scale[i] || false,
+        min: min[i] || null,
+        max: max[i] || null
       })
-    } else {
-      yAxis[i] = Object.assign({}, yAxisBase)
+      if (types[i]) {
+        yAxis[i].axisLabel = {
+          formatter: val => getFormat(val, types[i])
+        }
+      }
     }
-    yAxis[i].name = yAxisName[i] || ''
-    yAxis[i].scale = scale[i] || false
-    yAxis[i].min = min[i] || null
-    yAxis[i].max = max[i] || null
   }
   return yAxis
 }
 
-function getLineTooltip (args) {
-  const { axisSite, yAxisType, digit, labelMap, xAxisType, tooltipFormatter } = args
-  const rightItems = axisSite.right || []
-  const rightList = labelMap
-    ? rightItems.map(item => {
-      return labelMap[item] === undefined ? item : labelMap[item]
-    })
-    : rightItems
-  return {
-    trigger: 'axis',
-    formatter (items) {
-      if (tooltipFormatter) {
-        return tooltipFormatter.apply(null, arguments)
+function getSeries (args) {
+  const {
+    rows,
+    leftMetrics,
+    rightMetrics,
+    extraMetrics,
+    stack,
+    labelAlias,
+    dimension,
+    displayMetrics,
+    metricsType,
+    yAxisType,
+    area
+  } = args
+  const stackMap = stack && getStackMap(stack)
+  const series = []
+
+  displayMetrics.forEach((metricsItem, index) => {
+    const data = []
+    rows.forEach(row => {
+      let value = {
+        value: [row[dimension], row[metricsItem]],
+        _extra: [],
+        name: row[dimension],
+        format: metricsType[metricsItem] ||
+          (~leftMetrics.indexOf(metricsItem) && yAxisType[0]) ||
+          (~rightMetrics.indexOf(metricsItem) && yAxisType[1]) ||
+          false
       }
-      let tpl = []
-      const { name, axisValueLabel } = items[0]
-      const title = name || axisValueLabel
-      tpl.push(`${title}<br>`)
-      items.forEach(item => {
-        let showData = null
-        const type = ~rightList.indexOf(item.seriesName)
-          ? yAxisType[1]
-          : yAxisType[0]
-        const data = xAxisType === 'category'
-          ? item.data
-          : item.data[1]
-        showData = getFormated(data, type, digit)
-        tpl.push(`${item.seriesName}: ${showData}`)
-        tpl.push('<br>')
-      })
-      return tpl.join('')
-    }
-  }
+      if (index === displayMetrics.length - 1) {
+        extraMetrics.forEach(ext => {
+          value._extra.push({
+            name: row[dimension],
+            seriesName: ext,
+            value: [row[dimension], row[ext]],
+            format: metricsType[ext] || false
+          })
+        })
+      }
+      data.push(value)
+    })
+    series.push({
+      name: getFnAndObjValue(labelAlias, metricsItem),
+      type: 'line',
+      data,
+      yAxisIndex: ~leftMetrics.indexOf(metricsItem) ? 0 : 1, // TODO: 处理多图时的坐标轴问题，
+      xAxisIndex: 0,
+      stack: stack && stackMap[metricsItem],
+      areaStyle: area && { normal: {} }
+    })
+  })
+
+  return series
 }
 
+// function getTooltip (args) {
+// }
+
 function getLegend (args) {
-  const { metrics, legendName, labelMap } = args
-  if (!legendName && !labelMap) return { data: metrics }
-  const data = labelMap
-    ? metrics.map(item => (labelMap[item] == null ? item : labelMap[item]))
-    : metrics
+  const {
+    displayMetrics,
+    legendAlias,
+    labelAlias
+  } = args
+  if (!legendAlias && !labelAlias) return { data: displayMetrics }
+  const data = labelAlias
+    ? displayMetrics.map(item => getFnAndObjValue(labelAlias, item))
+    : displayMetrics
   return {
     data,
     formatter (name) {
-      return legendName[name] != null ? legendName[name] : name
+      return getFnAndObjValue(legendAlias, name)
     }
   }
 }
 
 export const line = (options, columns, rows, settings, extra) => {
   const {
+    dimension = columns[0],
+    metrics: customMetrics,
+    extraMetrics = [],
     axisSite = {},
-    yAxisType = ['normal', 'normal'],
+    gridIndex = 0,
     xAxisType = 'category',
+    xAxisName = '',
+    yAxisType = [],
     yAxisName = [],
-    dimension = [columns[0]],
-    xAxisName = [],
-    axisVisible = true,
-    area,
-    stack,
-    scale = [false, false],
-    min = [null, null],
-    max = [null, null],
-    nullAddZero = false,
-    digit = 2,
-    legendName = {},
-    labelMap = {},
-    label,
-    itemStyle,
-    lineStyle,
-    areaStyle
+    metricsType = {},
+    labelAlias,
+    legendAlias,
+    tooltipAlias,
+    scale = [],
+    stack = {},
+    min = [],
+    max = [],
+    area
   } = settings
-  const { tooltipVisible, legendVisible, tooltipFormatter } = extra
-  let metrics = columns.slice()
-
-  if (axisSite.left && axisSite.right) {
-    metrics = axisSite.left.concat(axisSite.right)
-  } else if (axisSite.left && !axisSite.right) {
-    metrics = axisSite.left
-  } else if (settings.metrics) {
-    metrics = settings.metrics
-  } else {
-    metrics.splice(columns.indexOf(dimension[0]), 1)
-  }
-
-  const legend = legendVisible && getLegend({ metrics, legendName, labelMap })
-  const tooltip = tooltipVisible && getLineTooltip({
-    axisSite,
-    yAxisType,
-    digit,
-    labelMap,
-    xAxisType,
-    tooltipFormatter
-  })
-  const xAxis = getLineXAxis({
+  const {
+    axisVisible,
+    legendVisible
+  } = extra
+  const metrics = customMetrics || arrDelItem(columns, dimension)
+  const rightMetrics = axisSite.right || []
+  const leftMetrics = axisSite.left || arrDelArrItem(metrics, rightMetrics)
+  const displayMetrics = leftMetrics.concat(rightMetrics)
+  const xAxis = getXAxis({
     dimension,
     rows,
+    gridIndex,
+    xAxisType,
     xAxisName,
-    axisVisible,
-    xAxisType
+    axisVisible
   })
-  const yAxis = getLineYAxis({
-    yAxisName,
+  const yAxis = getYAxis({
+    rightMetrics,
+    leftMetrics,
     yAxisType,
+    metricsType,
     axisVisible,
     scale,
     min,
     max,
-    digit
+    gridIndex,
+    yAxisName
   })
-  const series = getLineSeries({
+  const series = getSeries({
     rows,
-    axisSite,
-    metrics,
-    area,
+    leftMetrics,
+    rightMetrics,
+    extraMetrics,
     stack,
-    nullAddZero,
-    labelMap,
-    label,
-    itemStyle,
-    lineStyle,
-    areaStyle,
-    xAxisType,
-    dimension
+    labelAlias,
+    dimension,
+    displayMetrics,
+    metricsType,
+    yAxisType,
+    area
   })
-  if (!xAxis || !series) return false
-
-  options = { legend, xAxis, series, yAxis, tooltip }
+  const legend = legendVisible && getLegend({
+    legendAlias,
+    displayMetrics,
+    labelAlias
+  })
+  const tooltipSettings = {
+    trigger: 'axis',
+    tooltipAlias
+  }
+  optionsAddAttr(options, { xAxis, yAxis, series, legend, tooltipSettings })
+  console.log(options)
   return options
 }

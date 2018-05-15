@@ -1,40 +1,5 @@
-// TODO: 删除，使用 numeral 代替
-export const numberFormat = (val, digits = 2) => {
-  if (isNaN(+val)) return val
-
-  let symbolMap = [
-    { value: 1E18, symbol: 'E' },
-    { value: 1E15, symbol: 'P' },
-    { value: 1E12, symbol: 'T' },
-    { value: 1E9, symbol: 'B' },
-    { value: 1E6, symbol: 'M' },
-    { value: 1E3, symbol: 'k' }
-  ]
-
-  for (let i = 0; i < symbolMap.length; i++) {
-    if (Math.abs(val) >= symbolMap[i].value) {
-      return (val / symbolMap[i].value).toFixed(digits) + symbolMap[i].symbol
-    }
-  }
-
-  return val.toString()
-}
-// TODO: 删除，使用 numeral 代替
-export const formatTausends = (num) => {
-  return String(num).replace(/^(\s+|-)?\d+(?=.?\d*($|\s))/g, (m) => {
-    return m.replace(/(?=(?!\b)(\d{3})+$)/g, ',')
-  })
-}
-// TODO: 删除，使用 numeral 代替
-export const getFormated = (val, type, digit = 2, defaultVal = '-') => {
-  if (val == null || isNaN(val)) return defaultVal
-  switch (type) {
-    case 'KMB': return numberFormat(val)
-    case 'percent': return `${parseFloat((val * 100).toFixed(digit))}%`
-    case 'normal': return formatTausends(val)
-    default: return val
-  }
-}
+import cloneDeep from 'lodash/cloneDeep'
+import numeral from 'numeral'
 
 export const getStackMap = (stack) => {
   const stackMap = {}
@@ -116,13 +81,62 @@ export const getAmap = (key, v) => {
   }
   return amapPromise
 }
-// TODO: 删除，使用 clone 代替
-export const clone = (v) => JSON.parse(JSON.stringify(v))
 
-export const getType = (v) => Object.prototype.toString.call(v)
+export const getType = v => Object.prototype.toString.call(v)
 
-export const toKebab = (v) => v.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+export const toKebab = v => v.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 
-export const isArray = (v) => getType(v) === '[object Array]'
+export const isArray = v => getType(v) === '[object Array]'
 
-export const isObject = (v) => getType(v) === '[object Object]'
+export const isObject = v => getType(v) === '[object Object]'
+
+export const isFunction = v => typeof v === 'function'
+
+export const getFnAndObjValue = (target, key) => {
+  return isFunction(target)
+    ? target(key)
+    : !isObject(target)
+      ? key
+      : target[key] != null
+        ? target[key]
+        : key
+}
+
+export const getFormat = (v, format, defaultValue = '-') => {
+  if (v == null) return defaultValue
+  return format ? numeral(v).format(format) : v
+}
+
+export const arrDelItem = (arr, item) => {
+  const result = cloneDeep(arr)
+  const index = arr.indexOf(item)
+  result.splice(index, 1)
+  return result
+}
+
+export const arrDelArrItem = (arr, diffArr) => {
+  return arr.filter(item => !~diffArr.indexOf(item))
+}
+
+export const optionsAddAttr = (obj, target, item) => {
+  if (!target) return
+  if (isObject(target)) {
+    Object.keys(target).forEach(key => {
+      optionsAddAttr(obj, key, target[key])
+    })
+    return
+  }
+  if (obj[target] && isArray(obj[target])) {
+    if (isArray(item)) {
+      obj[target] = obj[target].concat(item)
+    } else {
+      obj[target].push(item)
+    }
+  } else {
+    if (isArray(item)) {
+      obj[target] = item
+    } else {
+      obj[target] = [item]
+    }
+  }
+}

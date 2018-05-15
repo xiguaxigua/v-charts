@@ -6,6 +6,8 @@
         <component
           :is="`ve-${innerType}`"
           :data="d.data"
+          :handler="handler"
+          v-bind="d.attr || {}"
           :settings="d.settings">
         </component>
       </div>
@@ -41,11 +43,15 @@ import VeLine from 'packages/line'
 // import VeGauge from '../../src/packages/gauge'
 // import VeTree from '../../src/packages/tree'
 import CHART_DATA from '../data'
+import { simpleDataConverter } from '@/converter'
 
 export default {
   name: 'Item',
 
   data () {
+    this.handler = {
+      dataConverter: simpleDataConverter
+    }
     return {
       chartData: [],
       type: null,

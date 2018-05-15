@@ -1,8 +1,9 @@
 import { COLORS, NO_DATA_LOGIC_PROPS, DEFAULT_THEME } from './constants'
-import { toKebab, isArray, isObject } from './utils'
+import { toKebab, isArray, isObject, getFormat, getFnAndObjValue } from './utils'
 import Loading from '@/components/loading'
 import DataEmpty from '@/components/data-empty'
-import debounce from 'throttle-debounce/debounce'
+import debounce from 'lodash/debounce'
+import set from 'lodash/set'
 
 export default {
   render (h) {
@@ -47,6 +48,7 @@ export default {
 
     tooltipVisible: { type: Boolean, default: true },
     legendVisible: { type: Boolean, default: true },
+    axisVisible: { type: Boolean, default: true },
 
     markLine: Object,
     markArea: Object,
@@ -69,6 +71,9 @@ export default {
     resizeDelay: { type: Number, default: 200 },
 
     changeDelay: { type: Number, default: 0 },
+
+    handler: Object,
+    useDataConverter: Boolean,
     // echarts props
     grid: [Object, Array],
     colors: Array,
@@ -168,24 +173,29 @@ export default {
     dataHandler () {
       const {
         chartHandler,
-        tooltipVisible,
         legendVisible,
+        axisVisible,
         echarts,
         tooltipFormatter,
         optionsHandler,
         settings,
-        beforeConfig
+        beforeConfig,
+        useDataConverter,
+        handler: {
+          dataConverter
+        } = {}
       } = this
       let { data } = this
       const extra = {
-        tooltipVisible,
         legendVisible,
+        axisVisible,
         echarts,
         tooltipFormatter
       }
       let options = {}
 
       if (!chartHandler) return
+      if (useDataConverter && dataConverter) data = dataConverter(data)
       if (beforeConfig) data = beforeConfig(data)
 
       const { columns = [], rows = [] } = data
@@ -222,8 +232,11 @@ export default {
         _once,
         afterSetOption,
         afterSetOptionOnce,
-        judgeWidth
+        judgeWidth,
+        tooltipVisible,
+        getTooltip
       } = this
+      if (tooltipVisible) getTooltip(options)
       // add echarts origin options attributes
       const echartsAttrs = [
         'grid', 'dataZoom', 'visualMap', 'toolbox', 'title', 'legend',
@@ -280,11 +293,56 @@ export default {
       }
     },
 
+    getTooltip (options) {
+      const { tooltipSettings = {} } = options
+      let trigger = 'item'
+      let tooltipAlias = null
+      tooltipSettings.forEach(tooltipItem => {
+        const {
+          trigger: customTrigger,
+          tooltipAlias: customTooltipAlias
+        } = tooltipItem
+        if (customTrigger) trigger = customTrigger
+        if (customTooltipAlias) tooltipAlias = customTooltipAlias
+      })
+      options.tooltip = {
+        show: true,
+        trigger,
+        formatter (items) {
+          const tpl = []
+          let title = getFnAndObjValue(tooltipAlias, items[0].name)
+          tpl.push(title)
+          items.forEach(item => {
+            const {
+              data: {
+                format,
+                value,
+                extra
+              },
+              seriesName,
+              marker
+            } = item
+            const val = value.length ? value[1] : value
+            tpl.push(`${marker}${seriesName}: ${getFormat(val, format)}`)
+            if (extra && extra.length) {
+              extra.forEach(extraItem => {
+                const { value, format, seriesName } = extraItem
+                const val = value.length ? value[1] : value
+                tpl.push(`${marker}${seriesName}: ${getFormat(val, format)}`)
+              })
+            }
+          })
+          return tpl.join('<br>')
+        }
+      }
+    },
+
     getExtendOptions (options, extend) {
       // extend sub attribute
-      // TODO: add more convenient extend
       Object.keys(extend).forEach(attr => {
-        if (typeof extend[attr] === 'function') {
+        if (/\.|]/.test(attr)) {
+          set(options, attr, extend[attr])
+        } else if (typeof extend[attr] === 'function') {
           // get callback value
           options[attr] = extend[attr](options[attr])
         } else {
@@ -302,6 +360,7 @@ export default {
           }
         }
       })
+      console.log('options', options)
     },
 
     judgeWidthHandler (options) {
@@ -399,12 +458,12 @@ export default {
     this.echarts = null
     this.registeredEvents = []
     this._once = {}
-    this.resizeHandler = debounce(this.resizeDelay, _ => {
+    this.resizeHandler = debounce(_ => {
       this.echarts && this.echarts.resize()
-    })
-    this.changeHandler = debounce(this.changeDelay, _ => {
+    }, this.resizeDelay)
+    this.changeHandler = debounce(_ => {
       this.dataHandler()
-    })
+    }, this.changeDelay)
     this.addWatchToProps()
   },
 
