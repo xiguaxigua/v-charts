@@ -9,8 +9,22 @@ module.exports = {
     }],
     ['script', { src: '/custom.js' }]
   ],
+  lastUpdated: 'Last Updated',
   ga: 'UA-118958706-1',
+  locales: {
+    '/en': {
+      lang: 'English',
+      title: 'VuePress',
+      description: 'Vue-powered Static Site Generator'
+    },
+    '/': {
+      lang: '中文',
+      title: 'VuePress',
+      description: 'Vue 驱动的静态网站生成器'
+    }
+  },
   themeConfig: {
+    repo: 'ElemeFe/v-charts',
     sidebar: {
       '/zh/': [
         'guide',
@@ -18,19 +32,6 @@ module.exports = {
       '/en/': [
         'guide'
       ]
-    },
-    nav: [
-      {
-        text: '语言',
-        items: [
-          { text: '中文', link: '/zh/guide' },
-          { text: 'English', link: '/en/guide' }
-        ]
-      },
-      {
-        text: 'Github',
-        link: 'https://github.com/elemefe/v-charts'
-      }
-    ]
+    }
   }
 }

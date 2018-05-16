@@ -1,12 +1,16 @@
 ### 开始使用
 
 {{ 1+1 }}
-<chart name="guide"/>
+
+<ClientOnly>
+  <chart name="guide"/>
+</ClientOnly>
+
 
 #### a例子
 
 <script>
-window.CHART_CODE = {
+CHART_CODE = {
   guide: {
     code: {
       content: `
