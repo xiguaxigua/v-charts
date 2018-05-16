@@ -82,8 +82,13 @@ export default {
 <style lang="stylus">
 @import "../../../node_modules/vuep/dist/vuep.css"
 
+td {
+  word-break: break-all
+}
+
 .vuep
   height: 460px
+  margin-top: 10px
 
 .chart-code
   position: relative

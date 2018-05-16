@@ -8,29 +8,70 @@ module.exports = {
     ['script', { src: '/chart-lib/index.min.js' }],
     ['link', { href: '/chart-lib/style.min.css', rel: 'stylesheet' }]
   ],
-  lastUpdated: 'Last Updated',
   ga: 'UA-118958706-1',
   locales: {
-    '/en': {
-      lang: 'English',
-      title: 'VuePress',
-      description: 'Vue-powered Static Site Generator'
-    },
     '/': {
-      lang: '中文',
+      lang: 'zh-CN',
       title: 'VuePress',
       description: 'Vue 驱动的静态网站生成器'
+    },
+    '/en/': {
+      lang: 'en-US',
+      title: 'VuePress',
+      description: 'Vue-powered Static Site Generator'
     }
   },
+  serviceWorker: true,
   themeConfig: {
     repo: 'ElemeFe/v-charts',
-    sidebar: {
-      '/zh/': [
-        'guide',
-      ],
-      '/en/': [
-        'guide'
-      ]
+    editLinks: true,
+    docsDir: 'docs',
+    locales: {
+      '/en/': {
+        label: 'English',
+        selectText: 'Languages',
+        editLinkText: 'Edit this page on GitHub',
+        lastUpdated: 'Last Updated',
+        nav: [
+          {
+            text: 'guide',
+            link: '/en/guide/',
+          }
+        ],
+        sidebar: {
+          '/en/guide/': genSidebarConfig('guide')
+        }
+      },
+      '/': {
+        label: '简体中文',
+        selectText: '选择语言',
+        editLinkText: '在 GitHub 上编辑此页',
+        lastUpdated: '上次更新',
+        nav: [
+          {
+            text: '指南',
+            link: '/guide/',
+          }
+        ],
+        sidebar: {
+          '/guide/': genSidebarConfig('指南')
+        }
+      }
     }
   }
+}
+
+function genSidebarConfig (title) {
+  return [
+    {
+      title,
+      collapsable: false,
+      children: [
+        '',
+        'guide',
+        'line',
+        'event'
+      ]
+    }
+  ]
 }
