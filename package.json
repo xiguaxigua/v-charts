@@ -4,9 +4,8 @@
   "description": "Vue Echarts Components",
   "main": "lib/index.js",
   "scripts": {
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
-    "docs:deploy": "./deploy.sh",
+    "docs": "vuepress dev docs",
+    "deploy": "./deploy.sh",
     "dev": "webpack-dev-server --inline --progress --config build/webpack.config.js",
     "build": "rm -rf lib && node build/rollup.config.js",
     "test": "karma start ./test/karma.conf.js" 
