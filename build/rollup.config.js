@@ -1,5 +1,5 @@
 const rollup = require('rollup')
-const vue = require('rollup-plugin-vue').default
+const vue = require('rollup-plugin-vue')
 const resolve = require('rollup-plugin-node-resolve')
 const babel = require('rollup-plugin-babel')
 const eslint = require('rollup-plugin-eslint')

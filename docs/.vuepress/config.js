@@ -2,12 +2,11 @@ module.exports = {
   title: 'v-charts',
   description: '基于 Vue2.x 的 Echarts 组件',
   head: [
-    ['link', {
-      rel: 'shortcut icon',
-      href: '/favicon.ico',
-      type: 'image/x-icon'
-    }],
-    ['script', { src: '/custom.js' }]
+    ['link', { rel: 'shortcut icon', href: '/favicon.ico', type: 'image/x-icon'}],
+    ['script', { src: 'https://cdn.jsdelivr.net/npm/babel-standalone/babel.min.js' }],
+    ['script', { src: 'https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js' }],
+    ['script', { src: '/chart-lib/index.min.js' }],
+    ['link', { href: '/chart-lib/style.min.css', rel: 'stylesheet' }]
   ],
   lastUpdated: 'Last Updated',
   ga: 'UA-118958706-1',
