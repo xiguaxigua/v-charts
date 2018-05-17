@@ -81,7 +81,7 @@ function rollupFn (item) {
 
   rollup.rollup({
     input: item.src,
-    external: id => /^(echarts|numeral)/.test(id),
+    external: id => /^(echarts)/.test(id),
     plugins
   }).then(function (bundle) {
     const dest = item.dist + item.suffix
@@ -90,7 +90,8 @@ function rollupFn (item) {
       format: item.type,
       name: item.globalName,
       globals: {
-        'echarts/lib/echarts': 'echarts'
+        'echarts/lib/echarts': 'echarts',
+        'numeral': 'numeral'
       },
       file: dest
     }).catch(e => {
