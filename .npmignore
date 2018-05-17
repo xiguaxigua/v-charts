@@ -6,7 +6,8 @@ src
 dist
 test
 deploy.sh
-CHANGELOG*
+CHANGELOG.md
+CHANGELOG_CN.md
 
 .babelrc
 .eslintrc.js
