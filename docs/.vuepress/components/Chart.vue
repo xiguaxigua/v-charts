@@ -6,9 +6,9 @@
       action="http://jsfiddle.net/api/post/library/pure/"
       class="chart-code-form"
       method="post">
-      <input type="hidden" name="html" :value="post.html">
-      <input type="hidden" name="css" :value="post.css">
-      <input type="hidden" name="js" :value="post.js">
+      <input type="hidden" name="html" :value="post[1]">
+      <input type="hidden" name="css" :value="post[0]">
+      <input type="hidden" name="js" :value="post[2]">
       <input type="hidden" name="panel_js" value="3">
       <input type="hidden" name="wrap" value="l">
       <button type="submit" class="chart-code-form-button">在线运行</button>
@@ -28,6 +28,18 @@ const COMMON_SOURCE = {
   ]
 }
 
+const REPLICE_LIST = [
+  { from: '<template>', to: '@!@<template>' },
+  { from: '</template>', to: '<template>@!@' },
+  { from: '<template>', to: '<div id="app">' },
+  { from: '</template>', to: '</div>' },
+  { from: '<style>', to: '' },
+  { from: '</style>', to: '' },
+  { from: '<script>', to: '' },
+  { from: 'export default {', to: 'new Vue({\n  el: \'#app\',\n' },
+  { from: '<\/script>', to: ')' }
+]
+
 export default {
   props: {
     name: String
@@ -46,21 +58,23 @@ export default {
         indent++
       })
       const reg = new RegExp(`^(\\s{0,${indent}}|[\\n])`, 'gm')
-      return str.replace(reg, '').replace(/^\s/, '')
+      return str.replace(reg, '')
     }
   },
   mounted () {
     const { name, getFormat } = this
     const result = {}
-    const post = window.CHART_CODE[name].post
-    Object.keys(post).forEach(key => {
-      result[key] = getFormat(post[key])
-      if (COMMON_SOURCE[key]) {
-        result[key] = `${COMMON_SOURCE[key].join('\n')}\n${result[key]}`
-      }
-    })
-    this.post = result
     const code = getFormat(window.CHART_CODE[name].code)
+    let post = code
+    REPLICE_LIST.forEach(({ from, to }) => {
+      post = post.replace(from, to)
+    })
+    post = post.replace(/components(\s|\S)+}/g, '')
+    post = post.replace(/,(\s|\n)+(\))$/gm, '\n})')
+    post = post.split('@!@').map(item => item.replace(/^\n+/gm, ''))
+    post[1] = `${COMMON_SOURCE['html'].join('\n')}\n${post[1]}`
+    this.post = post
+
     if (window.VeIndex) {
       Object.keys(VeIndex).forEach(key => {
         if (!key.indexOf('Ve')) {
