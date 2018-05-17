@@ -10,3 +10,7 @@ yarn-error.log*
 npm-debug.log*
 dist
 test
+.github
+src
+packages
+deploy.sh

@@ -9,6 +9,7 @@
     "deploy": "./deploy.sh",
     "dev": "webpack-dev-server --inline --progress --config build/webpack.config.js",
     "build": "rm -rf lib && node build/rollup.config.js",
+    "prepublishOnly": "npm run build",
     "test": "karma start ./test/karma.conf.js"
   },
   "repository": {
