@@ -3,7 +3,7 @@ import { getMapJSON, getFormated } from '../../utils'
 
 let registered = false
 
-function getTooltip (dataType, digit, dataStore, metrics, color, labelMap) {
+function setTooltip (dataType, digit, dataStore, metrics, color, labelMap) {
   return {
     formatter (item) {
       let tpl = []
@@ -94,7 +94,7 @@ function setGeoLabel (value, target, label) {
   }
 }
 
-function getLegendMap (args) {
+function setLegendMap (args) {
   const { metrics, legendName, labelMap } = args
   if (!legendName && !labelMap) return { data: metrics }
   const data = labelMap
@@ -143,8 +143,8 @@ export const map = (columns, rows, settings, extra) => {
   const { tooltipVisible, legendVisible, color } = extra
   const dataStore = {}
   rows.forEach(row => { dataStore[row[dimension]] = row })
-  const tooltip = tooltipVisible && getTooltip(dataType, digit, dataStore, metrics, color, labelMap)
-  const legend = legendVisible && getLegendMap({ metrics, legendName, labelMap })
+  const tooltip = tooltipVisible && setTooltip(dataType, digit, dataStore, metrics, color, labelMap)
+  const legend = legendVisible && setLegendMap({ metrics, legendName, labelMap })
   const seriesParams = {
     position,
     selectData,

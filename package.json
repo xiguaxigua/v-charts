@@ -31,7 +31,8 @@
     "vue": ">2.0.0"
   },
   "dependencies": {
-    "echarts-amap": "^1.0.0-rc.6"
+    "echarts-amap": "^1.0.0-rc.6",
+    "numeral": "^2.0.6"
   },
   "devDependencies": {
     "autoprefixer": "^8.5.0",
@@ -67,7 +68,6 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "^3.0.0",
-    "numeral": "^2.0.6",
     "phantomjs-prebuilt": "^2.1.16",
     "prismjs": "^1.14.0",
     "rollup": "^0.59.0",

@@ -1,7 +1,7 @@
 import { getFormated } from '../../utils'
 import { itemPoint } from '../../echarts-base'
 
-function getTooltip (args) {
+function setTooltip (args) {
   const {
     itemDataType,
     linksDataType,
@@ -88,7 +88,7 @@ export const sankey = (columns, rows, settings, extra) => {
 
   const itemDataType = dataType[0]
   const linksDataType = dataType[1]
-  const tooltip = getTooltip({
+  const tooltip = setTooltip({
     itemDataType,
     linksDataType,
     digit

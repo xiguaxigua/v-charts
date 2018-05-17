@@ -182,7 +182,7 @@ function getBarSeries (args) {
   return series.length ? series : false
 }
 
-function getLegend (args) {
+function setLegend (args) {
   const { metrics, labelMap, legendName } = args
   if (!legendName && !labelMap) return { data: metrics }
   const data = labelMap
@@ -253,7 +253,7 @@ export const bar = (columns, rows, settings, extra) => {
   }
   const dims = getDims(innerRows, dimension)
 
-  const legend = legendVisible && getLegend({ metrics, labelMap, legendName })
+  const legend = legendVisible && setLegend({ metrics, labelMap, legendName })
   const yAxis = getBarDimAxis({
     innerRows,
     dimAxisName,
@@ -347,7 +347,7 @@ export const histogram = (columns, rows, settings, status) => {
   const isHistogram = true
   const dims = getDims(innerRows, dimension)
 
-  const legend = legendVisible && getLegend({ metrics, labelMap, legendName })
+  const legend = legendVisible && setLegend({ metrics, labelMap, legendName })
   const xAxis = getBarDimAxis({
     innerRows,
     dimAxisName,

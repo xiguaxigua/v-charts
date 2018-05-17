@@ -123,27 +123,6 @@ function getSeries (args) {
   return series
 }
 
-// function getTooltip (args) {
-// }
-
-function getLegend (args) {
-  const {
-    displayMetrics,
-    legendAlias,
-    labelAlias
-  } = args
-  if (!legendAlias && !labelAlias) return { data: displayMetrics }
-  const data = labelAlias
-    ? displayMetrics.map(item => getFnAndObjValue(labelAlias, item))
-    : displayMetrics
-  return {
-    data,
-    formatter (name) {
-      return getFnAndObjValue(legendAlias, name)
-    }
-  }
-}
-
 export const line = (options, columns, rows, settings, extra) => {
   const {
     dimension = columns[0],
@@ -165,10 +144,7 @@ export const line = (options, columns, rows, settings, extra) => {
     max = [],
     area
   } = settings
-  const {
-    axisVisible,
-    legendVisible
-  } = extra
+  const { axisVisible } = extra
   const metrics = customMetrics || arrDelItem(columns, dimension)
   const rightMetrics = axisSite.right || []
   const leftMetrics = axisSite.left || arrDelArrItem(metrics, rightMetrics)
@@ -206,15 +182,21 @@ export const line = (options, columns, rows, settings, extra) => {
     yAxisType,
     area
   })
-  const legend = legendVisible && getLegend({
+  const _legendSettings = {
     legendAlias,
     displayMetrics,
     labelAlias
-  })
-  const tooltipSettings = {
+  }
+  const _tooltipSettings = {
     trigger: 'axis',
     tooltipAlias
   }
-  optionsAddAttr(options, { xAxis, yAxis, series, legend, tooltipSettings })
+  optionsAddAttr(options, {
+    xAxis,
+    yAxis,
+    series,
+    _legendSettings,
+    _tooltipSettings
+  })
   return options
 }

@@ -17,15 +17,15 @@ function getScatterTooltip (args) {
     trigger: tooltipTrigger,
     formatter (item) {
       if (isArray(item)) {
-        return item.map(i => getTooltipContent(i, args)).join('')
+        return item.map(i => setTooltipContent(i, args)).join('')
       } else {
-        return getTooltipContent(item, args)
+        return setTooltipContent(item, args)
       }
     }
   }
 }
 
-function getTooltipContent (item, args) {
+function setTooltipContent (item, args) {
   const { labelMap, columns, dataType, digit } = args
   const tpl = []
   const { color, seriesName, data: { value } } = item

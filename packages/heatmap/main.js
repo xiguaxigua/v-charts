@@ -83,7 +83,7 @@ function getSeries (args) {
   }]
 }
 
-function getTooltip (args) {
+function setTooltip (args) {
   const { dataType, innerXAxisList, innerYAxisList, digit, extraMetrics, metrics } = args
 
   return {
@@ -174,7 +174,7 @@ export const heatmap = (columns, rows, settings, status) => {
   const yAxis = getAxis(innerYAxisList, yAxisName)
   const visualMap = getVisualMap({ innerMin, innerMax, type, heatColor })
   const series = getSeries({ chartData })
-  const tooltip = tooltipVisible && getTooltip({
+  const tooltip = tooltipVisible && setTooltip({
     dataType,
     innerXAxisList,
     innerYAxisList,

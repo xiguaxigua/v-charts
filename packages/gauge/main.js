@@ -1,6 +1,6 @@
 import { isObject, getFormated } from '../../utils'
 
-function getTooltip (args) {
+function setTooltip (args) {
   const { tooltipFormatter, dataType, digit } = args
   return {
     formatter (options) {
@@ -87,7 +87,7 @@ export const gauge = (columns, rows, settings, extra) => {
 
   const { tooltipFormatter, tooltipVisible } = extra
 
-  const tooltip = tooltipVisible && getTooltip({
+  const tooltip = tooltipVisible && setTooltip({
     tooltipFormatter,
     dataType
   })

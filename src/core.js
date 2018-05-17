@@ -7,12 +7,14 @@ import {
   toKebab,
   isArray,
   isObject,
-  getFormat,
-  getFnAndObjValue,
   debounce
 } from './utils'
 import Loading from '@/components/loading'
 import DataEmpty from '@/components/data-empty'
+import setExtendOptions from './module/extend'
+import setTooltip from './module/tooltip'
+import setMarks from './module/mark'
+import setLegend from './module/legend'
 
 export default {
   render (h) {
@@ -81,7 +83,7 @@ export default {
 
     changeDelay: { type: Number, default: 0 },
 
-    handler: Object,
+    handler: { type: Object, default () { return {} } },
     useDataConverter: Boolean,
     // echarts props
     grid: [Object, Array],
@@ -156,96 +158,49 @@ export default {
 
   methods: {
     init () {
-      const {
-        echarts,
-        themeName,
-        theme,
-        $refs: {
-          canvas
-        },
-        initOptions,
-        echartsLib,
-        data,
-        createEventProxy,
-        resizeable,
-        resizeHandler
-      } = this
-
-      if (echarts) return
-      const themeArg = themeName || theme || DEFAULT_THEME
-      this.echarts = echartsLib.init(canvas, themeArg, initOptions)
-      if (data) this.changeHandler()
-      createEventProxy()
-      if (resizeable) window.addEventListener('resize', resizeHandler)
+      if (this.echarts) return
+      const themeArg = this.themeName || this.theme || DEFAULT_THEME
+      this.echarts = this.echartsLib.init(this.$refs.canvas, themeArg, this.initOptions)
+      if (this.data) this.changeHandler()
+      this.createEventProxy()
+      if (this.resizeable) window.addEventListener('resize', this.resizeHandler)
     },
 
     dataHandler () {
-      const {
-        chartHandler,
-        legendVisible,
-        axisVisible,
-        echarts,
-        tooltipFormatter,
-        optionsHandler,
-        settings,
-        beforeConfig,
-        useDataConverter,
-        handler: {
-          dataConverter
-        } = {}
-      } = this
+      const dataConverter = this.handler.dataConverter
       let { data } = this
-      const extra = {
-        legendVisible,
-        axisVisible,
-        echarts,
-        tooltipFormatter
-      }
       let options = {}
 
-      if (!chartHandler) return
-      if (useDataConverter && dataConverter) data = dataConverter(data)
-      if (beforeConfig) data = beforeConfig(data)
+      if (!this.chartHandler) return
+      if (this.useDataConverter && dataConverter) data = dataConverter(data)
+      if (this.beforeConfig) data = this.beforeConfig(data)
 
       const { columns = [], rows = [] } = data
 
-      options = chartHandler(
+      options = this.chartHandler(
         options,
         columns,
         rows,
-        settings,
-        extra
+        this.settings,
+        {
+          axisVisible: this.axisVisible,
+          echarts: this.echarts
+        }
       )
 
       if (options) {
         if (typeof options.then === 'function') {
-          options.then(optionsHandler)
+          options.then(this.optionsHandler)
         } else {
-          optionsHandler(options)
+          this.optionsHandler(options)
         }
       }
     },
 
     optionsHandler (options) {
-      const {
-        animation,
-        markArea,
-        markLine,
-        markPoint,
-        addMark,
-        chartColor,
-        getExtendOptions,
-        extend,
-        afterConfig,
-        echarts,
-        _once,
-        afterSetOption,
-        afterSetOptionOnce,
-        judgeWidth,
-        tooltipVisible,
-        getTooltip
-      } = this
-      if (tooltipVisible) getTooltip(options)
+      const { animation, echarts, _once } = this
+      if (this.tooltipVisible) setTooltip(options)
+      if (this.legendVisible) setLegend(options)
       // add echarts origin options attributes
       const echartsAttrs = [
         'grid', 'dataZoom', 'visualMap', 'toolbox', 'title', 'legend',
@@ -264,31 +219,30 @@ export default {
         })
       }
       // add mark* to echarts series
-      if (markArea || markLine || markPoint) {
+      if (this.markArea || this.markLine || this.markPoint) {
         const marks = {
-          markArea: markArea,
-          markLine: markLine,
-          markPoint: markPoint
+          markArea: this.markArea,
+          markLine: this.markLine,
+          markPoint: this.markPoint
         }
         const series = options.series
         if (isArray(series)) {
           series.forEach(item => {
-            addMark(item, marks)
+            setMarks(item, marks)
           })
         } else if (isObject(series)) {
-          addMark(series, marks)
+          setMarks(series, marks)
         }
       }
 
-      options.color = chartColor
+      options.color = this.chartColor
 
-      if (extend) getExtendOptions(options, extend)
+      if (this.extend) setExtendOptions(options, this.extend)
 
-      if (afterConfig) options = afterConfig(options)
-
+      if (this.afterConfig) options = this.afterConfig(options)
       echarts.setOption(options, true)
 
-      if (judgeWidth) this.judgeWidthHandler(options)
+      if (this.judgeWidth) this.judgeWidthHandler(options)
 
       this.$emit('ready', echarts)
       if (!_once['ready-once']) {
@@ -296,84 +250,14 @@ export default {
         this.$emit('ready-once', echarts)
       }
 
-      if (afterSetOption) afterSetOption(echarts)
-      if (afterSetOptionOnce && !_once['afterSetOptionOnce']) {
-        _once['afterSetOptionOnce'] = afterSetOptionOnce(echarts)
+      if (this.afterSetOption) this.afterSetOption(echarts)
+      if (this.afterSetOptionOnce && !_once['afterSetOptionOnce']) {
+        _once['afterSetOptionOnce'] = this.afterSetOptionOnce(echarts)
       }
-    },
-
-    getTooltip (options) {
-      const { tooltipSettings = {} } = options
-      let trigger = 'item'
-      let tooltipAlias = null
-      tooltipSettings.forEach(tooltipItem => {
-        const {
-          trigger: customTrigger,
-          tooltipAlias: customTooltipAlias
-        } = tooltipItem
-        if (customTrigger) trigger = customTrigger
-        if (customTooltipAlias) tooltipAlias = customTooltipAlias
-      })
-      options.tooltip = {
-        show: true,
-        trigger,
-        formatter (items) {
-          const tpl = []
-          let title = getFnAndObjValue(tooltipAlias, items[0].name)
-          tpl.push(title)
-          items.forEach(item => {
-            const {
-              data: {
-                format,
-                value,
-                extra
-              },
-              seriesName,
-              marker
-            } = item
-            const val = value.length ? value[1] : value
-            tpl.push(`${marker}${seriesName}: ${getFormat(val, format)}`)
-            if (extra && extra.length) {
-              extra.forEach(extraItem => {
-                const { value, format, seriesName } = extraItem
-                const val = value.length ? value[1] : value
-                tpl.push(`${marker}${seriesName}: ${getFormat(val, format)}`)
-              })
-            }
-          })
-          return tpl.join('<br>')
-        }
-      }
-    },
-
-    getExtendOptions (options, extend) {
-      // extend sub attribute
-      Object.keys(extend).forEach(attr => {
-        if (typeof extend[attr] === 'function') {
-          // get callback value
-          options[attr] = extend[attr](options[attr])
-        } else {
-          // mixin extend value
-          if (isArray(options[attr]) && isObject(options[attr][0])) {
-            // eg: [{ xx: 1 }, { xx: 2 }]
-            options[attr].forEach((option, index) => {
-              options[attr][index] = Object.assign({}, option, extend[attr])
-            })
-          } else if (isObject(options[attr])) {
-            // eg: { xx: 1, yy: 2 }
-            options[attr] = Object.assign({}, options[attr], extend[attr])
-          } else {
-            options[attr] = extend[attr]
-          }
-        }
-      })
     },
 
     judgeWidthHandler (options) {
-      const {
-        echarts,
-        widthChangeDelay
-      } = this
+      const { echarts } = this
 
       if (this.$el.clientWidth) {
         echarts && echarts.resize()
@@ -387,16 +271,10 @@ export default {
               if (!this.$el.clientWidth) {
                 console.warn(' Can\'t get dom width or height ')
               }
-            }, widthChangeDelay)
+            }, this.widthChangeDelay)
           }
         })
       }
-    },
-
-    addMark (seriesItem, marks) {
-      Object.keys(marks).forEach(key => {
-        if (marks[key]) seriesItem[key] = marks[key]
-      })
     },
 
     resize () {
@@ -404,38 +282,25 @@ export default {
     },
 
     addWatchToProps () {
-      const {
-        changeHandler,
-        $props,
-        _watchers
-      } = this
-      const watchedVariable = _watchers.map(watcher => watcher.expression)
-      Object.keys($props).forEach(prop => {
+      const watchedVariable = this._watchers.map(watcher => watcher.expression)
+      Object.keys(this.$props).forEach(prop => {
         if (!~watchedVariable.indexOf(prop) &&
           !~NO_DATA_LOGIC_PROPS.indexOf(prop)) {
           const opts = {}
-          const item = $props[prop]
+          const item = this.$props[prop]
           if (isObject(item) || isArray(item)) opts.deep = true
-          this.$watch(prop, changeHandler, opts)
+          this.$watch(prop, this.changeHandler, opts)
         }
       })
     },
 
     createEventProxy () {
-      // 只要用户使用 on 方法绑定的事件都做一层代理，
-      // 是否真正执行相应的事件方法取决于该方法是否仍然存在 events 中
-      // 实现 events 的动态响应
-      const {
-        registeredEvents,
-        events,
-        echarts
-      } = this
       const self = this
-      const keys = Object.keys(events || {})
+      const keys = Object.keys(this.events || {})
       keys.length && keys.forEach(ev => {
-        if (registeredEvents.indexOf(ev) === -1) {
-          registeredEvents.push(ev)
-          echarts.on(ev, (function (ev) {
+        if (this.registeredEvents.indexOf(ev) === -1) {
+          this.registeredEvents.push(ev)
+          this.echarts.on(ev, (function (ev) {
             return function (...args) {
               if (ev in self.events) {
                 self.events[ev].apply(null, args)
