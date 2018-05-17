@@ -25,7 +25,7 @@ const RESOURCE = [
   '<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"><\/script>',
   '<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"><\/script>',
   '<script src="https://cdn.jsdelivr.net/npm/numeral/numeral.js"><\/script>',
-  '<script src="https://cdn.jsdelivr.net/npm/v-charts-v2/lib/index.min.js"><\/script>',
+  '<script src="https://cdn.jsdelivr.net/npm/v-charts-v2@' + version + '/lib/index.min.js"><\/script>',
   '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/v-charts-v2/lib/style.min.css">'
 ]
 const SPLIT_SIGN = '@!@'

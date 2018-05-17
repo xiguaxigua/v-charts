@@ -1,3 +1,6 @@
+const version = require('../../package.json').version
+const webpack = require('webpack')
+
 module.exports = {
   title: 'v-charts',
   description: '基于 Vue2.x 的 Echarts 组件',
@@ -56,6 +59,13 @@ module.exports = {
         }
       }
     }
+  },
+  configureWebpack: {
+    plugins: [
+      new webpack.DefinePlugin({
+        version: JSON.stringify(version)
+      })
+    ]
   }
 }
 
