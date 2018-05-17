@@ -81,7 +81,7 @@ function rollupFn (item) {
 
   rollup.rollup({
     input: item.src,
-    external: id => /^(echarts)/.test(id),
+    external: id => /^(echarts|numeral)/.test(id),
     plugins
   }).then(function (bundle) {
     const dest = item.dist + item.suffix
