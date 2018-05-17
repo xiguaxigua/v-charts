@@ -8,7 +8,7 @@
     "docs:build": "vuepress build docs",
     "deploy": "./deploy.sh",
     "dev": "webpack-dev-server --inline --progress --config build/webpack.config.js",
-    "build": "rm -rf lib && node build/rollup.config.js && cp -f lib/index.min.js lib/style.min.css docs/.vuepress/public/chart-lib",
+    "build": "rm -rf lib && node build/rollup.config.js",
     "test": "karma start ./test/karma.conf.js"
   },
   "repository": {

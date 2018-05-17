@@ -38,8 +38,7 @@ CHART_CODE = {
               ]
             }
           }
-        },
-        components: { VeLine }
+        }
       }
       <\/script>
     `
