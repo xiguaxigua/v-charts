@@ -20,7 +20,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, .8);
+  background-color: rgba(255, 255, 255, .9);
+  z-index: 10;
 }
 
 .v-charts-component-loading .circular {

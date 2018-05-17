@@ -11,7 +11,7 @@
 | Tables        | Are           | Cool  |  x |
 | ------------- |:-------------:|:-----:|:--:|
 | col 3 is      | right-aligned | $16awehaskdjhalksjdhalkjdhsakjdhas00 |  q  |
-| col 2 is      | centeraasdhakjdhakjsdhklsahdakjshdlakjshdkljahsdkjhasdkjahskded      |   $12 |  q  |
+| col 2 is      | centeraasdhakkjshdkljahsdkjhasdkjahskded      |   $12 |  q  |
 | zebra stripes | are neat      |    $1 |   q |
 
 <script>
@@ -52,7 +52,7 @@ CHART_CODE = {
       export default {
         data () {
           this.chartSettings = {
-            yAxisType: ['0.0a']
+            yAxisType: ['0.[0]a']
           }
           return {
             chartData: {
@@ -67,8 +67,7 @@ CHART_CODE = {
               ]
             }
           }
-        },
-        components: { VeLine }
+        }
       }
       <\/script>
     `
