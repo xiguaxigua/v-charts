@@ -3,7 +3,7 @@
 #### npm
 
 ```
-npm i v-charts echarts -S
+npm i v-charts-v2 echarts -S
 ```
 
 #### cdn
@@ -20,8 +20,8 @@ npm i v-charts echarts -S
 
 ##### import all
 
-<iframe width="100%" height="430" src="//jsfiddle.net/vue_echarts/sbmhr2ex/5/embedded/result,html,js/?bodyColor=fff" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+<iframe src="//jsfiddle.net/vue_echarts/sbmhr2ex/5/embedded/result,html,js/?bodyColor=fff"></iframe>
 
 ##### import single chart
 
-<iframe width="100%" height="430" src="//jsfiddle.net/vue_echarts/aa7ojxyt/201/embedded/result,html,js/?bodyColor=fff" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+<iframe src="//jsfiddle.net/vue_echarts/aa7ojxyt/204/embedded/result,html,js/?bodyColor=fff"></iframe>

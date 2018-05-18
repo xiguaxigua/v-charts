@@ -6,7 +6,8 @@ module.exports = {
     ['link', { rel: 'shortcut icon', href: '/favicon.ico', type: 'image/x-icon'}],
     ['script', { src: 'https://cdn.jsdelivr.net/npm/babel-standalone/babel.min.js' }],
     ['script', { src: 'https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js' }],
-    ['script', { src: '/index.js' }]
+    ['script', { src: '/index.js' }],
+    ['link', { rel: "stylesheet", href: "/style.css" }]
   ],
   ga: 'UA-118958706-1',
   locales: {

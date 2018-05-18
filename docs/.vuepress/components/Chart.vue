@@ -97,13 +97,6 @@ export default {
 @import "../../../node_modules/vuep/dist/vuep.css"
 @import "../../../lib/style.min.css"
 
-table
-  width: 100%
-
-  td
-    white-space: pre-line;
-
-
 .vuep
   min-height: 460px
   height: inherit

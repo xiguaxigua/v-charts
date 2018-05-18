@@ -3,7 +3,7 @@
 #### npm 安装
 
 ```
-npm i v-charts echarts -S
+npm i v-charts-v2 echarts -S
 ```
 
 #### cdn
@@ -24,4 +24,4 @@ npm i v-charts echarts -S
 
 ##### 单独引入
 
-<iframe width="100%" height="430" src="//jsfiddle.net/vue_echarts/aa7ojxyt/200/embedded/result,html,js/?bodyColor=fff" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+<iframe width="100%" height="430" src="//jsfiddle.net/vue_echarts/aa7ojxyt/205/embedded/result,html,js/?bodyColor=fff" allowfullscreen="allowfullscreen" frameborder="0"></iframe>

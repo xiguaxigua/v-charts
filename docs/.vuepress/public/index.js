@@ -1,1 +1,0 @@
-window.CHART_CODE = {}
