@@ -150,6 +150,6 @@ export const debounce = (fn, delay) => {
     clearTimeout(timer)
     timer = setTimeout(function () {
       fn.apply(self, args)
-    })
+    }, delay)
   }
 }
