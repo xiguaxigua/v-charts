@@ -34,8 +34,12 @@ module.exports = {
         lastUpdated: 'Last Updated',
         nav: [
           {
-            text: 'guide',
+            text: 'Guide',
             link: '/en/guide/',
+          },
+          {
+            text: 'Sample project',
+            link: 'https://codesandbox.io/s/3qn1qvwl3q'
           }
         ],
         sidebar: {
@@ -51,6 +55,10 @@ module.exports = {
           {
             text: '指南',
             link: '/guide/',
+          },
+          {
+            text: '示例项目',
+            link: 'https://codesandbox.io/s/3qn1qvwl3q'
           }
         ],
         sidebar: {

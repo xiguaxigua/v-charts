@@ -105,7 +105,8 @@ table
 
 
 .vuep
-  height: 460px
+  min-height: 460px
+  height: inherit
 
 .v-charts-component-loading
   border: 1px solid #ccc
@@ -115,8 +116,9 @@ table
 
 .chart-code
   position: relative
-  height: 460px
+  min-height: 460px
   margin-top: 10px
+  height: inherit
 
   .chart-code-form
     position: absolute
