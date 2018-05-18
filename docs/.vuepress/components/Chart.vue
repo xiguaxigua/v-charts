@@ -67,7 +67,7 @@ export default {
   mounted () {
     const { name, getFormat } = this
     const result = {}
-    const code = getFormat(window.CHART_CODE[name].code)
+    const code = getFormat(window[name].code)
     let post = code
     REPLICE_LIST.forEach(({ from, to }) => {
       post = post.replace(from, to)
@@ -97,13 +97,21 @@ export default {
 @import "../../../node_modules/vuep/dist/vuep.css"
 @import "../../../lib/style.min.css"
 
-td {
-  word-break: break-all
-}
+table
+  width: 100%
+
+  td
+    white-space: pre-line;
 
 
 .vuep
   height: 460px
+
+.v-charts-component-loading
+  border: 1px solid #ccc
+
+  .path
+    stroke: #3eaf7c 
 
 .chart-code
   position: relative

@@ -2,24 +2,23 @@ const version = require('../../package.json').version
 const webpack = require('webpack')
 
 module.exports = {
-  title: 'v-charts',
-  description: '基于 Vue2.x 的 Echarts 组件',
   head: [
     ['link', { rel: 'shortcut icon', href: '/favicon.ico', type: 'image/x-icon'}],
     ['script', { src: 'https://cdn.jsdelivr.net/npm/babel-standalone/babel.min.js' }],
-    ['script', { src: 'https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js' }]
+    ['script', { src: 'https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js' }],
+    ['script', { src: '/index.js' }]
   ],
   ga: 'UA-118958706-1',
   locales: {
     '/': {
       lang: 'zh-CN',
-      title: 'VuePress',
-      description: 'Vue 驱动的静态网站生成器'
+      title: 'v-charts',
+      description: '基于 Vue2.x 的 Echarts 组件'
     },
     '/en/': {
       lang: 'en-US',
-      title: 'VuePress',
-      description: 'Vue-powered Static Site Generator'
+      title: 'v-charts',
+      description: 'Chart components based on Vue2.x and Echarts'
     }
   },
   serviceWorker: true,
@@ -40,7 +39,7 @@ module.exports = {
           }
         ],
         sidebar: {
-          '/en/guide/': genSidebarConfig('guide')
+          '/en/guide/': genSidebarConfig('Guide', 'Charts', 'Others')
         }
       },
       '/': {
@@ -55,7 +54,7 @@ module.exports = {
           }
         ],
         sidebar: {
-          '/guide/': genSidebarConfig('指南')
+          '/guide/': genSidebarConfig('介绍', '图表', '其他')
         }
       }
     }
@@ -65,19 +64,35 @@ module.exports = {
       new webpack.DefinePlugin({
         version: JSON.stringify(version)
       })
+      // new webpack.ProvidePlugin({
+      //   CHART_CODE: 'global-var-chart-code'
+      // })
     ]
   }
 }
 
-function genSidebarConfig (title) {
+function genSidebarConfig (intro, charts, others) {
   return [
     {
-      title,
+      title: intro,
       collapsable: false,
       children: [
         '',
-        'guide',
-        'line',
+        'start',
+        'props'
+      ]
+    },
+    {
+      title: charts,
+      collapsable: false,
+      children: [
+        'line'
+      ]
+    },
+    {
+      title: others,
+      collapsable: false,
+      children: [
         'event'
       ]
     }
