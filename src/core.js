@@ -20,8 +20,7 @@ export default {
   render (h) {
     return h('div', {
       class: [
-        toKebab(this.$options.name || this.$options._componentTag),
-        this.className // TODO: add test case
+        toKebab(this.$options.name || this.$options._componentTag)
       ],
       style: this.canvasStyle
     }, [
@@ -46,7 +45,6 @@ export default {
 
     width: { type: String, default: 'auto' },
     height: { type: String, default: '400px' },
-    className: String,
 
     beforeConfig: Function,
     afterConfig: Function,
@@ -75,8 +73,6 @@ export default {
 
     judgeWidth: { type: Boolean, default: false },
     widthChangeDelay: { type: Number, default: 300 },
-
-    tooltipFormatter: { type: Function },
 
     resizeable: { type: Boolean, default: true },
     resizeDelay: { type: Number, default: 200 },
@@ -227,9 +223,7 @@ export default {
         }
         const series = options.series
         if (isArray(series)) {
-          series.forEach(item => {
-            setMarks(item, marks)
-          })
+          series.forEach(item => { setMarks(item, marks) })
         } else if (isObject(series)) {
           setMarks(series, marks)
         }
@@ -252,7 +246,8 @@ export default {
 
       if (this.afterSetOption) this.afterSetOption(echarts)
       if (this.afterSetOptionOnce && !_once['afterSetOptionOnce']) {
-        _once['afterSetOptionOnce'] = this.afterSetOptionOnce(echarts)
+        _once['afterSetOptionOnce'] = true
+        this.afterSetOptionOnce(echarts)
       }
     },
 

@@ -73,9 +73,6 @@ module.exports = {
       new webpack.DefinePlugin({
         version: JSON.stringify(version)
       })
-      // new webpack.ProvidePlugin({
-      //   CHART_CODE: 'global-var-chart-code'
-      // })
     ]
   }
 }
@@ -88,7 +85,9 @@ function genSidebarConfig (intro, charts, others) {
       children: [
         '',
         'start',
-        'props'
+        'props',
+        'data',
+        'format'
       ]
     },
     {

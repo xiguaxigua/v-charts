@@ -1,14 +1,22 @@
 <template>
+  <!--
+    events: Object
+  -->
   <div>
-    <ve-line :data="chartData"></ve-line>
+    <ve-line :data="chartData" :events="events"></ve-line>
   </div>
 </template>
 
 <script>
 import { VeLine } from '../../src/index.es'
-import { LINE_DATA } from '../test/data'
+import { LINE_DATA } from './data'
 export default {
   data () {
+    this.events = {
+      click (v) {
+        console.log('v', v)
+      }
+    }
     return {
       chartData: LINE_DATA
     }

@@ -16,6 +16,7 @@
 
 <script>
 import chartData from '../data/index'
+import { TEST_ROUTES } from '../router'
 
 const routerInfo = {
   '图表': Object.keys(chartData).map(key => {
@@ -25,11 +26,10 @@ const routerInfo = {
     }
   }),
   '其他': [
-    { name: '事件监听', url: '/eventer' },
-    { name: '图表切换', url: '/toggle' },
     { name: '百度地图', url: '/bmap' },
     { name: '高德地图', url: '/amap' }
-  ]
+  ],
+  '测试示例': TEST_ROUTES.map(({ name, path }) => ({ name, url: path }))
 }
 
 export default {

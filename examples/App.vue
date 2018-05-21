@@ -27,10 +27,11 @@ export default {
 
 <style>
 * {
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -54,14 +55,14 @@ html, body {
 }
 
 .main-container {
-  flex: 1;
   display: flex;
+  flex: 1;
 }
 
 .left-section {
+  overflow: auto;
   width: 150px;
   height: 100%;
-  overflow: auto;
   background-color: #f8f8f8;
   border-right: 1px solid #f2f2f2;
 }
@@ -75,5 +76,24 @@ html, body {
 
 .right-section p {
   line-height: 22px;
+}
+
+button {
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  margin: 0;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  background-color: #409eff;
+  border: 1px solid #dcdfe6;
+  border-color: #409eff;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
 }
 </style>

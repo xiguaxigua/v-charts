@@ -15,7 +15,7 @@
   justify-content: center;
   align-items: center;
   color: #888;
-  font-size: 14px;
-  background-color: rgba(255, 255, 255, .7);
+  font-size: 16px;
+  background-color: rgba(255, 255, 255, .9);
 }
 </style>
