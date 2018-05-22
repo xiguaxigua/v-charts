@@ -1,5 +1,5 @@
 <template>
-  <!--
+  <!-- 测试属性
     theme: Object
     themeName: String
     initOptions: { type: Object, default () { return {} } }

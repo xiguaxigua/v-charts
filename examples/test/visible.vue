@@ -1,5 +1,5 @@
 <template>
-  <!--
+  <!-- 测试属性
     tooltipVisible: { type: Boolean, default: true },
     legendVisible: { type: Boolean, default: true },
     axisVisible: { type: Boolean, default: true },

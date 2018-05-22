@@ -1,5 +1,5 @@
 <template>
-  <!--
+  <!-- 测试属性
     extend: Object
   -->
   <div>

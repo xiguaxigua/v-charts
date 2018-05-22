@@ -1,5 +1,5 @@
 <template>
-  <!--
+  <!-- 测试属性
     beforeConfig: Function,
     afterConfig: Function,
     afterSetOption: Function,

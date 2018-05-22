@@ -1,5 +1,5 @@
 <template>
-  <!--
+  <!-- 测试属性
     grid: [Object, Array]
     colors: Array
     visualMap: [Object, Array]

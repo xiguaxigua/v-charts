@@ -63,7 +63,7 @@ module.exports = {
           }
         ],
         sidebar: {
-          '/guide/': genSidebarConfig('介绍', '图表', '其他')
+          '/guide/': genSidebarConfig('指南', '图表', '其他')
         }
       }
     }

@@ -1,5 +1,5 @@
 <template>
-  <!--
+  <!-- 测试属性
     data: { columns, rows }
     changeDelay: { type: Number, default: 0 }
     handler: { type: Object, default () { return {} } }

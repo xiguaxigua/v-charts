@@ -1,5 +1,5 @@
 <template>
-  <!--
+  <!-- 测试属性
     loading: Boolean,
     dataEmpty: Boolean,
   -->

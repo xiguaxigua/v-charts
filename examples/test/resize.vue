@@ -1,5 +1,5 @@
 <template>
-  <!--
+  <!-- 测试属性
     resizeable: { type: Boolean, default: true },
     resizeDelay: { type: Number, default: 200 },
   -->

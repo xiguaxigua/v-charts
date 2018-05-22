@@ -1,5 +1,5 @@
 <template>
-  <!--
+  <!-- 测试属性
     judgeWidth: { type: Boolean, default: false }
     widthChangeDelay: { type: Number, default: 300 }
   -->

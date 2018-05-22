@@ -1,5 +1,5 @@
 <template>
-  <!--
+  <!-- 测试属性
     markLine: Object
     markArea: Object
     markPoint: Object
